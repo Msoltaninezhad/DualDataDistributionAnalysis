@@ -1,0 +1,99 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+
+# Define data lists for Data 1 and Data 2
+data1 = [ ...
+]
+
+data2 = [
+...
+]
+
+# Convert the lists to DataFrames for easier manipulation
+df_data1 = pd.DataFrame(data1, columns=['Data'])
+df_data2 = pd.DataFrame(data2, columns=['Data'])
+
+# Get the statistical summary for both datasets
+data1_summary = df_data1.describe()
+data2_summary = df_data2.describe()
+print('Data 1', data1_summary)
+print('Data 2', data2_summary)
+
+# Flatten the data for plotting
+data1_flattened = df_data1.to_numpy().flatten()
+data2_flattened = df_data2.to_numpy().flatten()
+
+# Create the boxplot for visual comparison
+fig, ax = plt.subplots(figsize=(8, 6))
+bp = ax.boxplot([data1_flattened, data2_flattened], labels=['Data 1', 'Data 2'], showmeans=True, meanline=True, showfliers=False)
+ax.set_title('Boxplot for Data 1 and Data 2 Orientation Factor')
+ax.set_ylabel('Values')
+
+# Customize the boxplot colors and styles
+colors = ['#0000FF', '#00FF00']  # Blue for Data 1, Green for Data 2
+for element, color in zip(['boxes', 'whiskers', 'caps', 'medians', 'means'], colors * 2):
+    plt.setp(bp[element], color=color)
+
+# Save the boxplot as an SVG file
+plt.savefig('Boxplot_Data1_Data2.svg', format='svg')
+
+# Create and save the violin plot
+plt.figure(figsize=(8, 6))
+plt.violinplot([data1_flattened, data2_flattened], showmeans=True, showmedians=True)
+plt.xticks([1, 2], ['Data 1', 'Data 2'])
+plt.title('Violin Plot for Data 1 and Data 2')
+plt.ylabel('Values')
+plt.grid(True)
+plt.savefig('Violin_Plot_Data1_Data2.svg', format='svg')
+
+# Create and display histograms for both datasets
+plt.figure(figsize=(10, 6))
+plt.hist(data1, bins=20, alpha=0.5, label='Data 1')
+plt.hist(data2, bins=20, alpha=0.5, label='Data 2')
+plt.legend(loc='upper right')
+plt.title('Histogram of Data 1 and Data 2')
+plt.xlabel('Value')
+plt.ylabel('Frequency')
+
+# Generate and display KDE plots
+plt.figure(figsize=(8, 6))
+sns.kdeplot(data1_flattened, label='Data 1', shade=True, bw_adjust=0.5)
+sns.kdeplot(data2_flattened, label='Data 2', shade=True, bw_adjust=0.5)
+plt.title('KDE of Data 1 and Data 2')
+plt.xlabel('Value')
+plt.ylabel('Density')
+plt.legend()
+
+# Function to calculate and plot the CDF
+def compute_cdf(data):
+    data_sorted = np.sort(data)
+    cdf = np.arange(1, len(data_sorted) + 1) / len(data_sorted)
+    return data_sorted, cdf
+
+data1_sorted, data1_cdf = compute_cdf(data1_flattened)
+data2_sorted, data2_cdf = compute_cdf(data2_flattened)
+plt.figure(figsize=(8, 6))
+plt.plot(data1_sorted, data1_cdf, label='Data 1', marker='.', linestyle='none')
+plt.plot(data2_sorted, data2_cdf, label='Data 2', marker='.', linestyle='none')
+plt.title('CDF of Data 1 and Data 2')
+plt.xlabel('Value')
+plt.ylabel('CDF')
+plt.legend()
+
+# Combine data into a single DataFrame for the swarm plot
+combined_data = pd.DataFrame({
+    'Value': data1 + data2,
+    'Type': ['Data 1']*len(data1) + ['Data 2']*len(data2)
+})
+
+# Create and display the swarm plot
+plt.figure(figsize=(8, 6))
+sns.swarmplot(x='Type', y='Value', data=combined_data)
+plt.title('Swarm Plot of Data 1 and Data 2')
+plt.xlabel('Data Type')
+plt.ylabel('Values')
+
+# Show all the plots
+plt.show()
